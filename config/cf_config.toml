@@ -1,0 +1,26 @@
+# TOML for Rust, can be converted to JSON or YAML
+[device] 
+id = "cf-esp32-001"
+name = "Grow Rack Left"
+farm = "rack-a"
+location = "east-wall"
+
+[network]
+mqtt_broker = "mqtt://192.168.10.100"
+mqtt_port = 1883
+client_id = "cf-esp32-001"
+use_tls = false
+
+[sensors]
+temperature = true
+humidity = true
+soil_moisture = true
+ph = false
+
+[actuators]
+relay_1 = "pump"
+relay_2 = "lights"
+
+[reporting]
+interval_sec = 60
+discovery_interval_sec = 600
