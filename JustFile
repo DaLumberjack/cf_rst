@@ -1,0 +1,21 @@
+# CommuniFarm Justfile
+
+# Justfile
+set shell := ["powershell", "-NoProfile", "-Command"]
+# set shell := ["cmd.exe", "/C"]
+
+# Run the ESP firmware crate (esp/cf)
+cf-rst:
+    cargo run -p cf_rst
+
+# Build the ESP firmware crate
+cf-build:
+    cargo build -p cf_rst
+
+# Flash the ESP to device (adjust port and offset for your setup)
+flash-esp:
+    esptool.py --chip esp32 --port /dev/ttyUSB0 write_flash 0x10000 target/xtensa-esp32-none-elf/release/cf
+
+# Run the Home Assistant dev container (optional)
+ha-dev:
+    docker-compose -f docker/dev-ha.yml up

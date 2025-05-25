@@ -1,0 +1,8 @@
+# communifarm/Cargo.toml
+[workspace]
+members = [
+    "esp",            # Your ESP Rust firmware
+    "esp/cf-config",     # Optional: Shared config
+    # "libs/rust",         # Shared models/types
+    # "api"                # Optional: backend
+]
