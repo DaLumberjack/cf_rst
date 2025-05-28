@@ -11,8 +11,5 @@
     "esphome.esphome-vscode",
     "ms-vscode.remote-containers"
   ],
-  "mounts": [
-    "source=ha-config,target=/config,type=volume"
-  ],
   "remoteUser": "root"
 }
