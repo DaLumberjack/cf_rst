@@ -1,0 +1,35 @@
+{
+  "name": "communifarm",
+  "version": "0.0.0-development",
+  "description": "A smart farming automation system that connects ESP32 devices running Rust firmware to Home Assistant through MQTT communication",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "semantic-release": "semantic-release"
+  },
+  "keywords": [
+    "smart-farming",
+    "esp32",
+    "rust",
+    "home-assistant",
+    "mqtt",
+    "automation",
+    "iot"
+  ],
+  "author": "CommuniFarm Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/github": "^8.0.0",
+    "semantic-release": "^21.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DaLumberjack/cf_rst.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DaLumberjack/cf_rst/issues"
+  },
+  "homepage": "https://github.com/DaLumberjack/cf_rst#readme"
+}

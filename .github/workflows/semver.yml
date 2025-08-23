@@ -1,0 +1,175 @@
+name: Semantic Versioning
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  version:
+    runs-on: ubuntu-slim
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      new_release_published_tag: ${{ steps.semantic.outputs.new_release_published_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install semantic-release
+        run: npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Run semantic-release
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx semantic-release --dry-run
+          # Capture outputs for dry run
+          echo "new_release_published=false" >> $GITHUB_OUTPUT
+          echo "new_release_version=$(npx semantic-release --dry-run --print-version)" >> $GITHUB_OUTPUT
+          echo "new_release_published_tag=v$(npx semantic-release --dry-run --print-version)" >> $GITHUB_OUTPUT
+
+  release:
+    needs: version
+    runs-on: ubuntu-slim
+    if: needs.version.outputs.new_release_published == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install semantic-release
+        run: npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+  build-and-test:
+    runs-on: ubuntu-slim
+    needs: version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build ESP firmware
+        run: |
+          cd esp
+          cargo build --verbose
+
+      - name: Build cf-config
+        run: |
+          cd esp/cf-config
+          cargo build --verbose
+
+      - name: Test ESP firmware
+        run: |
+          cd esp
+          cargo test --verbose
+
+      - name: Test cf-config
+        run: |
+          cd esp/cf-config
+          cargo test --verbose
+
+  lint:
+    runs-on: ubuntu-slim
+    needs: version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - name: Run clippy
+        run: |
+          cd esp
+          cargo clippy -- -D warnings
+          cd cf-config
+          cargo clippy -- -D warnings
+
+      - name: Check formatting
+        run: |
+          cd esp
+          cargo fmt -- --check
+          cd cf-config
+          cargo fmt -- --check
+
+  security:
+    runs-on: ubuntu-slim
+    needs: version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run security audit
+        run: |
+          cd esp
+          cargo audit
+          cd cf-config
+          cargo audit
