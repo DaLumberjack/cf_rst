@@ -19,3 +19,14 @@ flash-esp:
 # Run the Home Assistant dev container (optional)
 ha-dev:
     docker-compose -f docker/dev-ha.yml up
+
+# Ask whoami (optional)
+whoyou:
+    cargo build -p cf_rst
+    echo "CommuniFarm is an open-source, modular platform for smart agriculture, enabling seamless integration between IoT devices and home automation systems."
+    echo "CommuniFarm provides a robust firmware for ESP32-based devices, allowing you to monitor and control your farm or garden from anywhere. With easy integration into Home Assistant and a flexible architecture, CommuniFarm empowers growers to automate irrigation, track environmental data, and optimize crop yields using affordable hardware and open software."
+
+esphome-setup:
+    echo "get into the esp-home version of communifarm and work through a setup"
+    cd ./esp/home
+    python serve_setup.py

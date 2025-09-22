@@ -1,0 +1,2 @@
+# Python dependencies for CommuniFarm ESPHome setup
+PyYAML>=6.0

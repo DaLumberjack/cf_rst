@@ -1,0 +1,99 @@
+# CommuniFarm Device Setup Configuration
+# This file defines the available sensors and switches that can be configured
+
+device_info:
+  name: "communifarm-device"
+  friendly_name: "CommuniFarm Device"
+  platform: "ESP32"
+  board: "esp32dev"
+
+# Available Sensors Configuration
+sensors:
+  dht22:
+    name: "DHT22 Temperature & Humidity"
+    description: "Digital temperature and humidity sensor"
+    pin: "GPIO4"
+    enabled: true
+    components:
+      - temperature
+      - humidity
+    update_interval: "30s"
+    
+  bme280:
+    name: "BME280 Environmental Sensor"
+    description: "Temperature, humidity, and pressure sensor"
+    address: "0x76"
+    i2c_bus: "bus_a"
+    enabled: false
+    components:
+      - temperature
+      - humidity
+      - pressure
+    update_interval: "30s"
+    
+  water_flow:
+    name: "Water Flow Sensor"
+    description: "Pulse counter for water flow measurement"
+    pin: "GPIO5"
+    enabled: false
+    unit_of_measurement: "L/min"
+    update_interval: "10s"
+    
+  air_quality:
+    name: "Air Quality Sensor (MQ135)"
+    description: "Air quality and gas detection"
+    pin: "GPIO34"
+    enabled: false
+    unit_of_measurement: "ppm"
+    update_interval: "30s"
+
+# Available Switches Configuration
+switches:
+  water_pump:
+    name: "Water Pump"
+    description: "Control water pump for irrigation"
+    pin: "GPIO2"
+    enabled: false
+    restore_mode: "ALWAYS_OFF"
+    
+  fan:
+    name: "Fan"
+    description: "Control ventilation fan"
+    pin: "GPIO3"
+    enabled: false
+    restore_mode: "ALWAYS_OFF"
+    
+  grow_light:
+    name: "Grow Light"
+    description: "Control LED grow lights"
+    pin: "GPIO4"
+    enabled: false
+    restore_mode: "ALWAYS_OFF"
+    
+  heater:
+    name: "Heater"
+    description: "Control heating element"
+    pin: "GPIO5"
+    enabled: false
+    restore_mode: "ALWAYS_OFF"
+
+# GPIO Pin Assignments
+gpio_pins:
+  dht_pin: "GPIO4"
+  flow_pin: "GPIO5"
+  air_quality_pin: "GPIO34"
+  i2c_sda: "GPIO21"
+  i2c_scl: "GPIO22"
+
+# Network Configuration
+network:
+  captive_portal:
+    ssid: "CommuniFarm Setup"
+    password: "setup123456"
+  mdns_services:
+    - service: "_esphomelib._tcp"
+      protocol: "_tcp"
+      port: 6053
+    - service: "_http._tcp"
+      protocol: "_tcp"
+      port: 80
