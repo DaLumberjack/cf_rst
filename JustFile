@@ -30,3 +30,41 @@ esphome-setup:
     echo "get into the esp-home version of communifarm and work through a setup"
     cd ./esp/home
     python serve_setup.py
+
+# Flash ESPHome setup files to ESP32 device
+# Usage: just flash-setup ESP_BOARD USB_PORT
+# Example: just flash-setup esp32dev COM3
+flash-setup ESP_BOARD USB_PORT:
+    echo "Flashing CommuniFarm setup files to ESP32"
+    echo "ESP Board: {{ESP_BOARD}}"
+    echo "USB Port: {{USB_PORT}}"
+    cd ./esp/home
+    # Create a basic ESPHome configuration for setup
+    echo "Creating temporary ESPHome configuration"
+
+    # Compile and flash using ESPHome
+    echo "Compiling and flashing ESPHome configuration"
+    esphome compile setup_device.yaml
+    esphome upload setup_device.yaml --device {{USB_PORT}}
+    echo "Setup device flashed successfully"
+    echo "Device will create CommuniFarm-Setup WiFi network"
+    echo "Connect to it with password communifarm123 to access setup interface"
+    echo "Visit the device web interface to configure"
+    echo "After setup, you can flash the generated main yaml configuration"
+
+# Flash the generated main.yaml configuration to ESP32
+# Usage: just flash-main USB_PORT
+# Example: just flash-main COM3
+# flash-main USB_PORT:
+#     echo "Flashing generated CommuniFarm configuration to ESP32"
+#     echo "USB Port: {{USB_PORT}}"
+#     cd ./esp/home
+#     if not exist main.yaml:
+#         echo "main yaml not found Run the setup generator first"
+#         echo "Use: just esphome-setup"
+#         exit 1
+#     echo "Compiling and flashing main yaml"
+#     esphome compile main.yaml
+#     esphome upload main.yaml --device {{USB_PORT}}
+#     echo "CommuniFarm device configuration flashed successfully"
+#     echo "Your device should now be running with the configured sensors and switches"
