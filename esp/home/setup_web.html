@@ -283,6 +283,46 @@
         .checkbox-item input[type="checkbox"]:checked + label strong {
             color: #667eea;
         }
+        
+        .signal-strength {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 8px;
+        }
+        
+        .signal-bar {
+            width: 3px;
+            background: #ddd;
+            border-radius: 1px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .signal-bar:nth-child(1) { height: 4px; }
+        .signal-bar:nth-child(2) { height: 6px; }
+        .signal-bar:nth-child(3) { height: 8px; }
+        
+        .signal-bar.active {
+            background: #28a745;
+        }
+        
+        .signal-bar.weak {
+            background: #ffc107;
+        }
+        
+        .signal-bar.strong {
+            background: #28a745;
+        }
+        
+        .wifi-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .wifi-name {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -301,11 +341,17 @@
                         <h3>🌐 WiFi Configuration <span class="required">*</span></h3>
                         <div class="form-group">
                             <label for="wifi_ssid">WiFi Network Name</label>
-                            <input type="text" id="wifi_ssid" name="wifi_ssid" required placeholder="Enter your WiFi network name">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="wifi_ssid" name="wifi_ssid" required style="flex: 1;">
+                                    <option value="">Select WiFi Network...</option>
+                                </select>
+                                <button type="button" id="scan_wifi" class="btn" style="width: auto; padding: 12px 20px; font-size: 14px;">🔍 Scan</button>
+                            </div>
+                            <div id="wifi_scan_status" style="margin-top: 8px; font-size: 14px; color: #666;"></div>
                         </div>
                         <div class="form-group">
                             <label for="wifi_password">WiFi Password</label>
-                            <input type="password" id="wifi_password" name="wifi_password" required placeholder="Enter your WiFi password">
+                            <input type="text" id="wifi_password" name="wifi_password" required placeholder="Enter WiFi password, continue if none">
                         </div>
                     </div>
                     
@@ -334,7 +380,31 @@
                                 <input type="checkbox" id="sensor_dht22" name="sensors" value="dht22" checked>
                                 <label for="sensor_dht22">
                                     <strong>🌡️ DHT22 Temperature & Humidity</strong>
-                                    <div class="description">Digital temperature and humidity sensor (GPIO4)</div>
+                                    <div class="description">
+                                        <label for="pin_dht22" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_dht22" name="pin_dht22" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="4" selected>GPIO4</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                            <option value="35">GPIO35</option>
+                                            <option value="36">GPIO36</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             
@@ -342,7 +412,50 @@
                                 <input type="checkbox" id="sensor_bme280" name="sensors" value="bme280">
                                 <label for="sensor_bme280">
                                     <strong>🌡️ BME280 Environmental</strong>
-                                    <div class="description">Temperature, humidity, and pressure sensor (I2C)</div>
+                                    <div class="description">
+                                        <label for="pin_bme280_sda" style="font-size: 12px; margin-right: 8px;">SDA:</label>
+                                        <select id="pin_bme280_sda" name="pin_bme280_sda" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="21" selected>GPIO21</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                        <label for="pin_bme280_scl" style="font-size: 12px; margin-left: 12px; margin-right: 8px;">SCL:</label>
+                                        <select id="pin_bme280_scl" name="pin_bme280_scl" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="22" selected>GPIO22</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             
@@ -350,7 +463,31 @@
                                 <input type="checkbox" id="sensor_water_flow" name="sensors" value="water_flow">
                                 <label for="sensor_water_flow">
                                     <strong>💧 Water Flow Sensor</strong>
-                                    <div class="description">Pulse counter for water flow measurement (GPIO5)</div>
+                                    <div class="description">
+                                        <label for="pin_water_flow" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_water_flow" name="pin_water_flow" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="5" selected>GPIO5</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                            <option value="35">GPIO35</option>
+                                            <option value="36">GPIO36</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             
@@ -358,7 +495,33 @@
                                 <input type="checkbox" id="sensor_air_quality" name="sensors" value="air_quality">
                                 <label for="sensor_air_quality">
                                     <strong>🌬️ Air Quality Sensor</strong>
-                                    <div class="description">Air quality and gas detection MQ135 (GPIO34)</div>
+                                    <div class="description">
+                                        <label for="pin_air_quality" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_air_quality" name="pin_air_quality" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="34" selected>GPIO34</option>
+                                            <option value="35">GPIO35</option>
+                                            <option value="36">GPIO36</option>
+                                            <option value="39">GPIO39</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -375,7 +538,30 @@
                                 <input type="checkbox" id="switch_water_pump" name="switches" value="water_pump">
                                 <label for="switch_water_pump">
                                     <strong>💧 Water Pump</strong>
-                                    <div class="description">Control water pump for irrigation (GPIO2)</div>
+                                    <div class="description">
+                                        <label for="pin_water_pump" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_water_pump" name="pin_water_pump" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="2" selected>GPIO2</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             
@@ -383,7 +569,31 @@
                                 <input type="checkbox" id="switch_fan" name="switches" value="fan">
                                 <label for="switch_fan">
                                     <strong>🌀 Fan</strong>
-                                    <div class="description">Control ventilation fan (GPIO3)</div>
+                                    <div class="description">
+                                        <label for="pin_fan" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_fan" name="pin_fan" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="3" selected>GPIO3</option>
+                                            <option value="2">GPIO2</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             
@@ -391,7 +601,31 @@
                                 <input type="checkbox" id="switch_grow_light" name="switches" value="grow_light">
                                 <label for="switch_grow_light">
                                     <strong>💡 Grow Light</strong>
-                                    <div class="description">Control LED grow lights (GPIO4)</div>
+                                    <div class="description">
+                                        <label for="pin_grow_light" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_grow_light" name="pin_grow_light" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="4" selected>GPIO4</option>
+                                            <option value="2">GPIO2</option>
+                                            <option value="3">GPIO3</option>
+                                            <option value="5">GPIO5</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             
@@ -399,7 +633,31 @@
                                 <input type="checkbox" id="switch_heater" name="switches" value="heater">
                                 <label for="switch_heater">
                                     <strong>🔥 Heater</strong>
-                                    <div class="description">Control heating element (GPIO5)</div>
+                                    <div class="description">
+                                        <label for="pin_heater" style="font-size: 12px; margin-right: 8px;">Pin:</label>
+                                        <select id="pin_heater" name="pin_heater" style="width: 80px; font-size: 12px; padding: 4px;">
+                                            <option value="5" selected>GPIO5</option>
+                                            <option value="2">GPIO2</option>
+                                            <option value="3">GPIO3</option>
+                                            <option value="4">GPIO4</option>
+                                            <option value="12">GPIO12</option>
+                                            <option value="13">GPIO13</option>
+                                            <option value="14">GPIO14</option>
+                                            <option value="15">GPIO15</option>
+                                            <option value="16">GPIO16</option>
+                                            <option value="17">GPIO17</option>
+                                            <option value="18">GPIO18</option>
+                                            <option value="19">GPIO19</option>
+                                            <option value="21">GPIO21</option>
+                                            <option value="22">GPIO22</option>
+                                            <option value="23">GPIO23</option>
+                                            <option value="25">GPIO25</option>
+                                            <option value="26">GPIO26</option>
+                                            <option value="27">GPIO27</option>
+                                            <option value="32">GPIO32</option>
+                                            <option value="33">GPIO33</option>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -481,6 +739,43 @@
     </div>
     
     <script>
+        // Pin validation and conflict detection
+        function validatePinAssignments() {
+            const formData = new FormData(document.getElementById('setupForm'));
+            const usedPins = new Set();
+            const conflicts = [];
+            
+            // Check sensor pins
+            const sensors = Array.from(formData.getAll('sensors'));
+            sensors.forEach(sensor => {
+                if (sensor === 'bme280') {
+                    const sda = formData.get('pin_bme280_sda');
+                    const scl = formData.get('pin_bme280_scl');
+                    if (usedPins.has(sda)) conflicts.push(`BME280 SDA (GPIO${sda}) conflicts with another pin`);
+                    if (usedPins.has(scl)) conflicts.push(`BME280 SCL (GPIO${scl}) conflicts with another pin`);
+                    if (sda === scl) conflicts.push(`BME280 SDA and SCL cannot use the same pin (GPIO${sda})`);
+                    usedPins.add(sda);
+                    usedPins.add(scl);
+                } else {
+                    const pinField = `pin_${sensor}`;
+                    const pin = formData.get(pinField);
+                    if (usedPins.has(pin)) conflicts.push(`${sensor} (GPIO${pin}) conflicts with another pin`);
+                    usedPins.add(pin);
+                }
+            });
+            
+            // Check switch pins
+            const switches = Array.from(formData.getAll('switches'));
+            switches.forEach(switchItem => {
+                const pinField = `pin_${switchItem}`;
+                const pin = formData.get(pinField);
+                if (usedPins.has(pin)) conflicts.push(`${switchItem} (GPIO${pin}) conflicts with another pin`);
+                usedPins.add(pin);
+            });
+            
+            return conflicts;
+        }
+        
         // Configuration summary update
         function updateConfigSummary() {
             const formData = new FormData(document.getElementById('setupForm'));
@@ -490,11 +785,28 @@
             const friendlyName = formData.get('friendly_name') || 'CommuniFarm Device';
             const location = formData.get('device_location') || 'Not specified';
             
+            // Check for pin conflicts
+            const conflicts = validatePinAssignments();
+            
             const summary = document.getElementById('config_summary');
             let html = `
                 <h4>Device: ${friendlyName}</h4>
                 <p><strong>Device ID:</strong> ${deviceName}</p>
                 <p><strong>Location:</strong> ${location}</p>
+            `;
+            
+            if (conflicts.length > 0) {
+                html += `
+                    <div style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; padding: 10px; margin: 10px 0;">
+                        <strong>⚠️ Pin Conflicts Detected:</strong>
+                        <ul style="margin: 5px 0 0 20px;">
+                            ${conflicts.map(conflict => `<li>${conflict}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            html += `
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
                     <div>
                         <h5>📊 Enabled Sensors (${sensors.length})</h5>
@@ -504,14 +816,17 @@
             if (sensors.length === 0) {
                 html += '<li>No sensors selected</li>';
             } else {
-                const sensorNames = {
-                    'dht22': 'DHT22 Temperature & Humidity',
-                    'bme280': 'BME280 Environmental',
-                    'water_flow': 'Water Flow Sensor',
-                    'air_quality': 'Air Quality Sensor'
-                };
                 sensors.forEach(sensor => {
-                    html += `<li>${sensorNames[sensor] || sensor}</li>`;
+                    let pinInfo = '';
+                    if (sensor === 'bme280') {
+                        const sda = formData.get('pin_bme280_sda');
+                        const scl = formData.get('pin_bme280_scl');
+                        pinInfo = `SDA(GPIO${sda}), SCL(GPIO${scl})`;
+                    } else {
+                        const pin = formData.get(`pin_${sensor}`);
+                        pinInfo = `GPIO${pin}`;
+                    }
+                    html += `<li><strong>${sensor}</strong> : ${pinInfo}</li>`;
                 });
             }
             
@@ -526,14 +841,9 @@
             if (switches.length === 0) {
                 html += '<li>No switches selected</li>';
             } else {
-                const switchNames = {
-                    'water_pump': 'Water Pump',
-                    'fan': 'Fan',
-                    'grow_light': 'Grow Light',
-                    'heater': 'Heater'
-                };
                 switches.forEach(switchItem => {
-                    html += `<li>${switchNames[switchItem] || switchItem}</li>`;
+                    const pin = formData.get(`pin_${switchItem}`);
+                    html += `<li><strong>${switchItem}</strong> : GPIO${pin}</li>`;
                 });
             }
             
@@ -570,6 +880,33 @@
         // Preview button
         document.getElementById('preview_btn').addEventListener('click', function() {
             const formData = new FormData(document.getElementById('setupForm'));
+            
+            const sensors = Array.from(formData.getAll('sensors'));
+            const switches = Array.from(formData.getAll('switches'));
+            
+            // Build sensor configuration with user-selected pins
+            const sensorConfig = {};
+            sensors.forEach(sensor => {
+                if (sensor === 'bme280') {
+                    const sda = formData.get('pin_bme280_sda');
+                    const scl = formData.get('pin_bme280_scl');
+                    sensorConfig[sensor] = {
+                        sda: `GPIO${sda}`,
+                        scl: `GPIO${scl}`
+                    };
+                } else {
+                    const pin = formData.get(`pin_${sensor}`);
+                    sensorConfig[sensor] = `GPIO${pin}`;
+                }
+            });
+            
+            // Build switch configuration with user-selected pins
+            const switchConfig = {};
+            switches.forEach(switchItem => {
+                const pin = formData.get(`pin_${switchItem}`);
+                switchConfig[switchItem] = `GPIO${pin}`;
+            });
+            
             const config = {
                 wifi: {
                     ssid: formData.get('wifi_ssid'),
@@ -580,8 +917,8 @@
                     friendly_name: formData.get('friendly_name'),
                     location: formData.get('device_location')
                 },
-                sensors: Array.from(formData.getAll('sensors')),
-                switches: Array.from(formData.getAll('switches')),
+                sensors: sensorConfig,
+                switches: switchConfig,
                 settings: {
                     update_interval: formData.get('update_interval'),
                     log_level: formData.get('log_level'),
@@ -612,6 +949,47 @@ ${JSON.stringify(config, null, 2)}
             e.preventDefault();
             
             const formData = new FormData(this);
+            
+            // Check for pin conflicts before submission
+            const conflicts = validatePinAssignments();
+            if (conflicts.length > 0) {
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                status.className = 'status error';
+                status.innerHTML = `
+                    <strong>⚠️ Pin Conflicts Detected:</strong><br>
+                    ${conflicts.map(conflict => `• ${conflict}`).join('<br>')}<br>
+                    Please resolve conflicts before submitting.
+                `;
+                return;
+            }
+            
+            const sensors = Array.from(formData.getAll('sensors'));
+            const switches = Array.from(formData.getAll('switches'));
+            
+            // Build sensor configuration with user-selected pins
+            const sensorConfig = {};
+            sensors.forEach(sensor => {
+                if (sensor === 'bme280') {
+                    const sda = formData.get('pin_bme280_sda');
+                    const scl = formData.get('pin_bme280_scl');
+                    sensorConfig[sensor] = {
+                        sda: `GPIO${sda}`,
+                        scl: `GPIO${scl}`
+                    };
+                } else {
+                    const pin = formData.get(`pin_${sensor}`);
+                    sensorConfig[sensor] = `GPIO${pin}`;
+                }
+            });
+            
+            // Build switch configuration with user-selected pins
+            const switchConfig = {};
+            switches.forEach(switchItem => {
+                const pin = formData.get(`pin_${switchItem}`);
+                switchConfig[switchItem] = `GPIO${pin}`;
+            });
+            
             const config = {
                 wifi: {
                     ssid: formData.get('wifi_ssid'),
@@ -622,8 +1000,8 @@ ${JSON.stringify(config, null, 2)}
                     friendly_name: formData.get('friendly_name'),
                     location: formData.get('device_location')
                 },
-                sensors: Array.from(formData.getAll('sensors')),
-                switches: Array.from(formData.getAll('switches')),
+                sensors: sensorConfig,
+                switches: switchConfig,
                 settings: {
                     update_interval: formData.get('update_interval'),
                     log_level: formData.get('log_level'),
@@ -649,6 +1027,109 @@ ${JSON.stringify(config, null, 2)}
             }, 2000);
         });
         
+        // WiFi scanning functionality
+        function createSignalStrengthBars(strength) {
+            const bars = [];
+            let activeBars = 0;
+            
+            if (strength >= 80) {
+                activeBars = 3;
+            } else if (strength >= 50) {
+                activeBars = 2;
+            } else if (strength >= 20) {
+                activeBars = 1;
+            }
+            
+            for (let i = 0; i < 3; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'signal-bar';
+                if (i < activeBars) {
+                    bar.classList.add(strength >= 80 ? 'strong' : 'weak');
+                }
+                bars.push(bar);
+            }
+            
+            return bars;
+        }
+        
+        function populateWifiDropdown(networks) {
+            const select = document.getElementById('wifi_ssid');
+            const status = document.getElementById('wifi_scan_status');
+            
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">Select WiFi Network...</option>';
+            
+            if (networks.length === 0) {
+                status.textContent = 'No WiFi networks found. Make sure you are in range.';
+                status.style.color = '#e74c3c';
+                return;
+            }
+            
+            // Sort networks by signal strength (strongest first)
+            networks.sort((a, b) => b.strength - a.strength);
+            
+            networks.forEach(network => {
+                const option = document.createElement('option');
+                option.value = network.ssid;
+                
+                // Create option content with signal strength
+                const optionContent = document.createElement('div');
+                optionContent.className = 'wifi-option';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'wifi-name';
+                nameSpan.textContent = network.ssid;
+                
+                const signalDiv = document.createElement('div');
+                signalDiv.className = 'signal-strength';
+                createSignalStrengthBars(network.strength).forEach(bar => {
+                    signalDiv.appendChild(bar);
+                });
+                
+                optionContent.appendChild(nameSpan);
+                optionContent.appendChild(signalDiv);
+                
+                // For select options, we can only use text content
+                option.textContent = `${network.ssid} (${network.strength}%)`;
+                option.setAttribute('data-strength', network.strength);
+                
+                select.appendChild(option);
+            });
+            
+            status.textContent = `Found ${networks.length} WiFi networks`;
+            status.style.color = '#28a745';
+        }
+        
+        function scanWifiNetworks() {
+            const status = document.getElementById('wifi_scan_status');
+            const scanBtn = document.getElementById('scan_wifi');
+            
+            status.textContent = 'Scanning for WiFi networks...';
+            status.style.color = '#667eea';
+            scanBtn.disabled = true;
+            scanBtn.textContent = '🔄 Scanning...';
+            
+            // Simulate WiFi scanning with realistic data
+            // In a real implementation, this would make an API call to the ESP32
+            setTimeout(() => {
+                const mockNetworks = [
+                    { ssid: 'HomeNetwork_5G', strength: 85 },
+                    { ssid: 'HomeNetwork_2.4G', strength: 78 },
+                    { ssid: 'NeighborWiFi', strength: 45 },
+                    { ssid: 'GuestNetwork', strength: 32 },
+                    { ssid: 'PublicWiFi', strength: 25 },
+                    { ssid: 'HiddenNetwork', strength: 15 }
+                ];
+                
+                populateWifiDropdown(mockNetworks);
+                scanBtn.disabled = false;
+                scanBtn.textContent = '🔍 Scan';
+            }, 2000);
+        }
+        
+        // WiFi scan button event listener
+        document.getElementById('scan_wifi').addEventListener('click', scanWifiNetworks);
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Auto-focus on WiFi SSID field
@@ -656,6 +1137,9 @@ ${JSON.stringify(config, null, 2)}
             
             // Initial config summary update
             updateConfigSummary();
+            
+            // Auto-scan WiFi networks on page load
+            scanWifiNetworks();
         });
     </script>
 </body>
