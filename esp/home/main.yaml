@@ -62,7 +62,7 @@ binary_sensor:
     name: "WiFi Status"
     id: wifi_status
 
-# Configuration sensors (will be populated based on user selection)
+# Sensors
 sensor:
   # DHT22 Temperature and Humidity
   - platform: dht
@@ -70,7 +70,7 @@ sensor:
     temperature:
       name: "Temperature"
       id: temperature
-      unit_of_measurement: "°C"
+      unit_of_measurement: "�C"
       accuracy_decimals: 1
     humidity:
       name: "Humidity"
@@ -80,100 +80,26 @@ sensor:
     update_interval: 30s
     id: dht_sensor
 
-  # BME280 Environmental Sensor
-  - platform: bme280
-    address: 0x76
-    i2c_id: bus_a
-    temperature:
-      name: "BME280 Temperature"
-      id: bme280_temperature
-      unit_of_measurement: "°C"
-      accuracy_decimals: 1
-    pressure:
-      name: "BME280 Pressure"
-      id: bme280_pressure
-      unit_of_measurement: "hPa"
-      accuracy_decimals: 1
-    humidity:
-      name: "BME280 Humidity"
-      id: bme280_humidity
-      unit_of_measurement: "%"
-      accuracy_decimals: 1
-    update_interval: 30s
-    id: bme280_sensor
-
-  # Water Flow Sensor
-  - platform: pulse_counter
-    pin: GPIO5
-    name: "Water Flow"
-    id: water_flow
-    unit_of_measurement: "L/min"
-    accuracy_decimals: 2
-    filters:
-      - multiply: 0.001
-    update_interval: 10s
-
-  # Air Quality Sensor (MQ135)
-  - platform: adc
-    pin: GPIO34
-    name: "Air Quality"
-    id: air_quality
-    unit_of_measurement: "ppm"
-    accuracy_decimals: 0
-    update_interval: 30s
-    filters:
-      - median:
-          window_size: 5
-          send_every: 5
-
-# Switches for controlling devices
+# Switches
 switch:
-  # Water Pump Control
+  # Water Pump
   - platform: gpio
     pin: GPIO2
     name: "Water Pump"
     id: water_pump
     restore_mode: ALWAYS_OFF
-
-  # Fan Control
+  # Fan
   - platform: gpio
     pin: GPIO3
     name: "Fan"
     id: fan
     restore_mode: ALWAYS_OFF
 
-  # LED Grow Light
-  - platform: gpio
-    pin: GPIO4
-    name: "Grow Light"
-    id: grow_light
-    restore_mode: ALWAYS_OFF
-
-  # Heater Control
-  - platform: gpio
-    pin: GPIO5
-    name: "Heater"
-    id: heater
-    restore_mode: ALWAYS_OFF
-
-# I2C Bus for BME280
-i2c:
-  sda: GPIO21
-  scl: GPIO22
-  scan: true
-  id: bus_a
-
 # GPIO Pins for sensors
 gpio:
   - pin: GPIO4
     mode: INPUT_PULLUP
     id: dht_pin
-  - pin: GPIO5
-    mode: INPUT_PULLUP
-    id: flow_pin
-  - pin: GPIO34
-    mode: INPUT
-    id: air_quality_pin
 
 # Time for scheduling
 time:
