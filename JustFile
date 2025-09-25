@@ -31,6 +31,17 @@ esphome-setup:
     cd ./esp/home
     python serve_setup.py
 
+# Install ESPHome CLI and dependencies
+install-esphome:
+    echo "Installing ESPHome CLI and dependencies..."
+    pip install esphome
+    pip install esptool
+    pip install platformio
+    echo "ESPHome installation complete!"
+    echo "Verifying installation..."
+    esphome version
+    esptool version
+
 # Flash ESPHome setup files to ESP32 device
 # Usage: just flash-setup ESP_BOARD USB_PORT
 # Example: just flash-setup esp32dev COM3
