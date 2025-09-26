@@ -1,13 +1,12 @@
-from homeassistant.core import HomeAssistant
 import json
+from homeassistant.core import HomeAssistant
 
 DOMAIN = "communifarm"
 
 async def async_setup(hass: HomeAssistant, config: dict):
     async def discovery_handler(msg):
         data = json.loads(msg.payload)
-        device_id = data["device_id"]
-        for comp in data["components"]:
+        for comp in data.get("components", []):
             if comp["type"] == "sensor":
                 hass.async_create_task(hass.helpers.discovery.async_load_platform(
                     "sensor", DOMAIN, comp, config))

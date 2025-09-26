@@ -8,13 +8,14 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         def __init__(self):
             self._attr_name = discovery_info["name"]
             self._attr_unique_id = discovery_info["state_topic"]
-            self._attr_native_unit_of_measurement = discovery_info.get("unit", "")
             self._attr_native_value = None
+            self._topic = discovery_info["state_topic"]
 
         async def async_added_to_hass(self):
-            async def update(msg):
+            async def handle_update(msg):
                 self._attr_native_value = float(msg.payload)
                 self.async_write_ha_state()
-            await hass.components.mqtt.async_subscribe(discovery_info["state_topic"], update)
+
+            await hass.components.mqtt.async_subscribe(self._topic, handle_update)
 
     add_entities([CFSensor()])

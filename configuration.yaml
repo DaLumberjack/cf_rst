@@ -1,0 +1,24 @@
+homeassistant:
+  name: CommuniFarm Dev
+  latitude: 47.0
+  longitude: -122.0
+  elevation: 50
+  unit_system: metric
+  currency: USD
+  country: US
+  time_zone: America/Los_Angeles
+  internal_url: "http://localhost:8123"
+
+default_config:
+
+mqtt:
+  broker: 127.0.0.1
+  port: 1883
+  discovery: false  # We handle custom discovery manually
+
+logger:
+  default: info
+  logs:
+    custom_components.communifarm: debug
+
+communifarm:  # This line triggers your custom component to load
